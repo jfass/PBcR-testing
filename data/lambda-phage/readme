@@ -1,0 +1,6 @@
+
+# grabbing simulated phage reads, and PB reads, and lambda-phage reference, from Koren 2012 Nature Biotech pub, from here: 
+wget ftp://ftp.cbcb.umd.edu/pub/data/PBcR/sampleData.tar.gz
+tar xzvf sampleData.tar.gz
+rm sampleData.tar.gz
+
