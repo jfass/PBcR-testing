@@ -1,6 +1,0 @@
-
-# grabbing simulated phage reads, and PB reads, from Koren 2012 Nature Biotech pub, from here: 
-wget ftp://ftp.cbcb.umd.edu/pub/data/PBcR/sampleData.tar.gz
-tar xzvf sampleData.tar.gz
-
-

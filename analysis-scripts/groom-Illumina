@@ -1,0 +1,9 @@
+
+# by visual inspection, Illumina reads contain original Solexa adapters, and have Sanger-encoded qualities so
+mkdir ../intermediate-files/groom-Illumina
+../tools/scythe/scythe -a ../tools/scythe/solexa_adapters.fa -q sanger -o ../intermediate-files/groom-Illumina/SRR001665_1.scy.fastq -n 2 ../data/Ecoli_K12-MG1655/Illumina/SRR001665_1.fastq
+../tools/scythe/scythe -a ../tools/scythe/solexa_adapters.fa -q sanger -o ../intermediate-files/groom-Illumina/SRR001665_2.scy.fastq -n 2 ../data/Ecoli_K12-MG1655/Illumina/SRR001665_2.fastq
+../tools/sickle/sickle pe -f ../intermediate-files/groom-Illumina/SRR001665_1.scy.fastq -r ../intermediate-files/groom-Illumina/SRR001665_2.scy.fastq -t sanger -o ../intermediate-files/groom-Illumina/SRR001665_1.scy.sic.fastq -p ../intermediate-files/groom-Illumina/SRR001665_2.scy.sic.fastq -s ../intermediate-files/groom-Illumina/SRR001665_orphans.scy.sic.fastq -q 30 -n
+
+
+

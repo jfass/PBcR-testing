@@ -1,0 +1,57 @@
+
+mkdir ../intermediate-files/PBcR-diginorm-OLC
+
+# start with shuffled paired reads, with old style headers (#0/1 and #0/2)
+# may not be necessary in latest khmer?
+mkdir ../intermediate-files/PBcR-diginorm-OLC/diginorm
+cat ../intermediate-files/groom-Illumina/SRR001665_1.scy.sic.fastq | perl -ne '$h=$_; $r=<>; $r.=<>; $r.=<>; @H=split(/\s/,$h); print "@".$H[1]."#0/1\n".$r' > ../intermediate-files/PBcR-diginorm-OLC/diginorm/for.fq
+cat ../intermediate-files/groom-Illumina/SRR001665_2.scy.sic.fastq | perl -ne '$h=$_; $r=<>; $r.=<>; $r.=<>; @H=split(/\s/,$h); print "@".$H[1]."#0/2\n".$r' > ../intermediate-files/PBcR-diginorm-OLC/diginorm/rev.fq
+../tools/velvet/contrib/shuffleSequences_fasta/shuffleSequences_fastq.pl ../intermediate-files/PBcR-diginorm-OLC/diginorm/for.fq ../intermediate-files/PBcR-diginorm-OLC/diginorm/rev.fq ../intermediate-files/PBcR-diginorm-OLC/diginorm/shuf.fq
+
+# diginorm steps
+export PYTHONPATH=/share/apps/khmer/python
+# export PYTHONPATH=../../../tools/khmer/python/
+cd ../intermediate-files/PBcR-diginorm-OLC/diginorm/
+/share/apps/khmer/scripts/normalize-by-median.py -C 60 -k 15 -N 4 -x 2.5e8 --savehash firstpass shuf.fq
+/share/apps/khmer/scripts/filter-abund.py firstpass shuf.fq.keep
+/share/apps/khmer/scripts/normalize-by-median.py -C 50 -k 25 -N 4 -x 1e8 shuf.fq.keep.abundfilt
+# no apparent filtering in 2nd normalize-by-median step ... ?!
+# result is fasta; create faked fastq because it's needed for PBcR
+python /share/apps/khmer/sandbox/strip-and-split-for-assembly.py shuf.fq.keep.abundfilt.keep
+cat shuf.fq.keep.abundfilt.keep.pe | perl -ne '$h=$_; $s=<>; chomp $s; print "@".substr($h,1).$s."\n+\n"; print "I" x length($s); print "\n"' > shuf.fq.keep.abundfilt.keep.pe.fq
+# split up pairs for Velvet, later (?? necessary? -- NO)
+# cat shuf.fq.keep.abundfilt.keep.pe.fq | perl -ne '$r1=$_; $r1.=<>; $r1.=<>; $r1.=<>; <>; <>; <>; <>; print $r1' > diginormed_1.fq
+# cat shuf.fq.keep.abundfilt.keep.pe.fq | perl -ne '<>; <>; <>; $r2=<>; $r2.=<>; $r2.=<>; $r2.=<>; print $r2' > diginormed_2.fq
+cd ../../../analysis-scripts/
+ 
+# correct PB reads
+mkdir ../intermediate-files/PBcR-diginorm-OLC/PBcR
+export PATH=$PATH:/classico/jfass/projects/pet/JF_PBcR-testing/tools/amos-3.1.0/bin/
+cd ../intermediate-files/PBcR-diginorm-OLC/PBcR/
+ln -s ../diginorm/shuf.fq.keep.abundfilt.keep.pe.fq ./illumina.fq
+../../../tools/wgs-assembler/Linux-amd64/bin/fastqToCA -libraryname illumina -technology illumina -type sanger -innie -reads illumina.fq > illumina.frg
+wget http://www.cbcb.umd.edu/software/PBcR/data/sampleData/pacbio.spec
+# modify spec file for reads < 64bp:
+echo -ne "frgMinLen = 30\novlMinLen = 27\nmerSize = 10\n" >> pacbio.spec
+../../../tools/wgs-assembler/Linux-amd64/bin/pacBioToCA -maxGap 16000 -shortReads -length 500 -partitions 200 -l pacbio -t 16 -s pacbio.spec -fastq ../../../data/Ecoli_K12-MG1655/PacBio/PacBioCLR/PacBio_10kb_CLR.fastq illumina.frg > run.out 2>&1
+
+# run wgs-assembler on corrected PacBio reads, alone
+wget http://www.cbcb.umd.edu/software/PBcR/data/sampleData/asm.spec
+../../../tools/wgs-assembler/Linux-amd64/bin/runCA -p asm -d asm -s asm.spec pacbio.frg > asm.out 2>&1
+cd ../../../analysis-scripts/
+
+# Reorder wgs-assembler contigs to E. coli reference using Mauve, for easy comparison
+mkdir ../intermediate-files/PBcR-diginorm-OLC/mauveReorder
+# problem with contig reorderer finding 'progressiveMauve' binary - maybe X11-forwarding issue?? workaround is to run from within Mauve directory:
+cd ../tools/mauve_2.3.1/
+java -Xmx5000m -cp Mauve.jar org.gel.mauve.contigs.ContigOrderer -output ../../intermediate-files/PBcR-diginorm-OLC/mauveReorder -ref ../../data/Ecoli_K12-MG1655/reference/ecoli_K12_MG1655.fasta -draft ../../intermediate-files/PBcR-diginorm-OLC/PBcR/asm/9-terminator/asm.scf.fasta
+cd ../../analysis-scripts
+
+# link for final assembly for 'PBcR-diginorm-OLC' pipeline
+mkdir ../results/PBcR-diginorm-OLC
+cd ../results/PBcR-diginorm-OLC/
+ln -s ../../intermediate-files/PBcR-diginorm-OLC/mauveReorder/alignment4/asm.scf.fasta ./final_PBcR-diginorm-OLC.fasta
+cd ../../analysis-scripts
+
+
+

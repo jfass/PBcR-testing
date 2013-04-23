@@ -1,0 +1,28 @@
+
+# Velvet
+wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.08.tgz
+tar xzvf velvet_1.2.08.tgz
+cd velvet
+make 'MAXKMERLENGTH=99' 'CATEGORIES=6' 'BIGASSEMBLY=1' 'LONGSEQUENCES=1'
+cd ..
+
+# Scythe
+git clone https://github.com/ucdavis-bioinformatics/scythe.git
+cd scythe
+# NOTE: on Ubuntu, have to edit Makefile to move "$(LDFLAGS)" to the end of every line it appears on!
+make build
+cd ..
+
+# Sickle
+git clone https://github.com/ucdavis-bioinformatics/sickle.git
+cd sickle
+# NOTE: on Ubuntu, have to edit Makefile to move "$(LDFLAGS)" to the end of every line it appears on!
+make
+cd ..
+
+
+
+
+
+
+

@@ -7,3 +7,9 @@
 # http://sourceforge.net/apps/mediawiki/wgs-assembler/index.php?title=PacBioToCA
 # diginorm:
 # http://ged.msu.edu/papers/2012-diginorm/
+
+# Overall workflow:
+# set up data and tools directories first (see readme's there)
+# then run analysis from analysis-scripts directory, e.g. 'source fill'
+
+

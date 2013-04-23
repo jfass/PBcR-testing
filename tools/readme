@@ -1,0 +1,70 @@
+
+# Velvet
+wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.08.tgz
+tar xzvf velvet_1.2.08.tgz
+cd velvet
+make 'MAXKMERLENGTH=99' 'CATEGORIES=6' 'BIGASSEMBLY=1' 'LONGSEQUENCES=1'
+cd ..
+
+# Scythe
+git clone https://github.com/ucdavis-bioinformatics/scythe.git
+cd scythe
+# NOTE: on Ubuntu, have to edit Makefile to move "$(LDFLAGS)" to the end of every line it appears on!
+make build
+cd ..
+
+# Sickle
+git clone https://github.com/ucdavis-bioinformatics/sickle.git
+cd sickle
+# NOTE: on Ubuntu, have to edit Makefile to move "$(LDFLAGS)" to the end of every line it appears on!
+make
+cd ..
+
+# Mauve
+wget http://gel.ahabs.wisc.edu/mauve/downloads/mauve_linux_2.3.1.tar.gz
+tar xzvf mauve_linux_2.3.1.tar.gz 
+
+# "Diginorm" tools
+git clone git://github.com/ged-lab/screed.git
+cd screed
+sudo python setup.py install
+cd ..
+git clone git://github.com/ged-lab/khmer.git
+cd khmer
+### having trouble installing khmer -- quiz ZW!
+cd ..
+
+# PBcR (wgs-assembler 7.0 from source, March 2013, so pacBioToCA has -maxGap option)
+# following non-deprecated instructions here: http://sourceforge.net/apps/mediawiki/wgs-assembler/index.php?title=Check_out_and_Compile
+mkdir wgs
+cd wgs-assembler
+cvs -d:pserver:anonymous@wgs-assembler.cvs.sourceforge.net:/cvsroot/wgs-assembler co -P src
+svn checkout svn://svn.code.sf.net/p/kmer/code/trunk kmer
+# install kmer
+cd kmer
+gmake install
+cd ..
+# mod for PB RS data
+cat src/AS_global.h | perl -pe 's/#define AS_READ_MAX_NORMAL_LEN_BITS\s+11/#define AS_READ_MAX_NORMAL_LEN_BITS\t15/' > tempfile
+mv tempfile src/AS_global.h 
+# install samtools for PB RS data
+svn co http://samtools.svn.sourceforge.net/svnroot/samtools/trunk samtools
+cd samtools/samtools/
+make
+cd ../../
+# compile wgs-assembler
+cd src
+gmake
+cd ..
+
+# AMOS (need bank-transact from AMOS for PBcR)
+wget http://downloads.sourceforge.net/project/amos/amos/3.1.0/amos-3.1.0.tar.gz
+tar xzvf amos-3.1.0.tar.gz
+cd amos-3.1.0
+./configure  # ignore warnings about nucmer, etc. - not necessary for bank-transact?
+make
+# ... several hours later ... (ignore errors at end)
+make install
+cd ..
+
+
