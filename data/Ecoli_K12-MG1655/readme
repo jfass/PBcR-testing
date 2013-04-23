@@ -1,0 +1,26 @@
+
+# grabbed adapter sequence from PacBio document
+echo -en ">PBadapter\nATCTCTCTCTTTTCCTCCTCCTCCGTTGTTGTTGTTGAGAGAGAT\n" > PBadapter.fa
+
+mkdir reference
+# downloaded reference fasta from http://www.ncbi.nlm.nih.gov/nuccore/49175990 
+# see readme in reference dir
+mkdir Illumina PacBio
+# download Illumina SRA database from http://www.ncbi.nlm.nih.gov/sra/SRX000429
+curl ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR001/SRR001665/SRR001665.sra > Illumina/SRR001665.sra
+cd Illumina
+/share/apps/sratoolkit/fastq-dump ./SRR001665.sra
+# produces for / rev reads (SRR001665_1 and _2.fastq) and SRR001665.fastq which appears to be less than 5000 low quality single reads 
+rm SRR001665.fastq
+cd ..
+# grab PacBio data for K12 from DevNet page
+curl http://www.pacificbiosciences.com/devnet/files/datasets/secondary-analysis/e-coli-k12-de-novo/1.3.0/Ecoli_MG1655_pacBioToCA.tgz > PacBio/EcoliMG1655_pacBioToCA.tgz
+cd PacBio
+tar xzvf Ecoli_MG1655_pacBioToCA.tgz
+cat PacBioCLR/PacBio_10kb_CLR.fastq | perl -ne '$h=$_; $s=<>; <>; <>; print ">".substr($h,1).$s' > PacBioCLR/PacBio_10kb_CLR.fasta
+cat PacBioCLR/PacBio_10kb_CLR.fastq | perl -ne '$h=$_; <>; <>; $q=<>; print ">".substr($h,1); @Q=split(//,$q); while (@Q) {$p=shift(@Q); $ps=ord($p)-33; print $ps." "} print "\n"' > PacBioCLR/PacBio_10kb_CLR.qual
+cd ..
+
+
+
+

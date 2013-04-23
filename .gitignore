@@ -1,5 +1,6 @@
 data/*
 !data/Ecoli_K12-MG1655
+data/Ecoli_K12-MG1655/*
 !data/Ecoli_K12-MG1655/readme
 tools/*
 !tools/readme
