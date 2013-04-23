@@ -1,8 +1,0 @@
-
-
-# progressiveMauve alignment between known E Coli reference and all alignments
-cd ../tools/mauve_2.3.1/
-./progressiveMauve --output=../../results/final-comparison.xmfa ../../results/short-only/final_short-only.fasta ../../results/fill/final_fill.fasta ../../results/PBcR-OLC/final_PBcR-OLC.fasta ../../results/PBcR-hybrid/final_PBcR-hybrid.fasta ../../results/PBcR-diginorm-OLC/final_PBcR-diginorm-OLC.fasta ../../results/PBcR-diginorm-hybrid/final_PBcR-diginorm-hybrid.fasta
-cd ../../analysis-scripts/
-
-
