@@ -1,4 +1,10 @@
 
+# sratoolkit
+git clone https://github.com/NCBITools/sratoolkit.git
+cd sratoolkit/
+# go get coffee ...
+cd ..
+
 # Velvet
 wget http://www.ebi.ac.uk/~zerbino/velvet/velvet_1.2.08.tgz
 tar xzvf velvet_1.2.08.tgz

@@ -9,11 +9,7 @@ mkdir Illumina PacBio
 # download Illumina SRA database from http://www.ncbi.nlm.nih.gov/sra/SRX000429
 curl ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR001/SRR001665/SRR001665.sra > Illumina/SRR001665.sra
 cd Illumina
-
-# !!! forgot about installing sratoolkit locally -- add this to tools directory, change command:
-/share/apps/sratoolkit/fastq-dump ./SRR001665.sra
-# !!!
-
+../../../tools/sratoolkit/linux/gcc/stat/x86_64/rel/bin/fastq-dump --split-files ./SRR001665.sra
 # produces for / rev reads (SRR001665_1 and _2.fastq) and SRR001665.fastq which appears to be less than 5000 low quality single reads 
 rm SRR001665.fastq
 cd ..
